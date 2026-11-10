@@ -271,7 +271,7 @@ inspect → build / edit / mesh / settings → render 看图 → slice 验证 �
 
 ## 按需加载（门控）
 
-八个工具的定义合计约 **6,900 token**，会随每次请求一起发送。绝大多数会话根本不碰 3MF，
+八个工具全部注册时，定义合计约 **6,900 token**，会随每次请求一起发送。绝大多数会话根本不碰 3MF，
 所以这些定义默认**不进入上下文**：`lib/gate.mjs` 在**每个模型步**用
 `register(definition, { when })` 判定一次，判定为否时工具会同时从工具描述、PTC 绑定和派发中消失。
 
@@ -328,8 +328,10 @@ inspect → build / edit / mesh / settings → render 看图 → slice 验证 �
 ```
 index.js                 宿主半边：注册工具（零外部 import，便于 link 安装）
 lib/bridge.mjs           Python 进程桥：JSON stdin/stdout、超时、取消、错误码
+lib/gate.mjs             每步门控：按工作目录与会话历史决定八个工具是否进入上下文
 lib/tools.mjs            8 个 ToolDefinition：入参 schema、输出 schema、卡片与图片
 lib/slice.mjs            Bambu Studio CLI 调用、间距预检与结果解析
+locale/zh.json, en.json  工具卡片标题与描述的本地化文案
 python/threemf/package.py    zip/OPC 读写，条目保真
 python/threemf/model.py      根模型 / 对象文件 / 变换矩阵 / 网格
 python/threemf/settings.py   model_settings、project_settings、盘原点
@@ -342,7 +344,11 @@ python/threemf/cli.py        JSON 命令入口（含 preflight）
 python/threemf/slicing.py    slice_info.config 解析（切片包的真实时长/耗材）
 python/threemf/compare.py    两份 3MF 的逐键对比与 diff 文本
 selftest/run_selftest.py     对样本副本跑端到端断言（含合成切片包、genus/悬垂、diff）
+selftest/gating.mjs          门控单测（36 项，离线，不需要设备或 Python）
+selftest/make_fixtures*.py   生成 output-schema 契约样本（v05 起含建模/诊断）
+selftest/schema_contract.mjs 用工具自己声明的 schema 校验真实内核输出
 selftest/slice_result.mjs    result.json 解析 + 切片输出 schema 契约
+selftest/data/               契约测试用的固定样本（如合成切片 result.json）
 ```
 
 ## 已知限制
@@ -382,12 +388,12 @@ node selftest/schema_contract.mjs selftest/fixtures_v05
 空网格不崩、band 越界被拒、`z_mode=bed` 底面定位、选区接缝告警、设置写回、渲染产物（含 `framing=objects`）、STL 往返、
 编辑后切片（含移动对象坐标断言）、切割后切片、删除后包仍可打开（assemble/关系无残留 + 真切片）、
 连通体列表、只缩放指定连通体（其余不动）并切片、Core 3MF、已切片文件拒绝、满盘时诊断噪声与耗时、
-**JS output-schema 契约校验**（`selftest/schema_contract.mjs` + `make_fixtures.py` / `make_fixtures_v05.py`），
+**JS output-schema 契约校验**（`selftest/schema_contract.mjs` + `selftest/make_fixtures.py` / `selftest/make_fixtures_v05.py`），
 源文件哈希不变。加 `--skip-slice` 可跳过多轮真实切片。
 
 ## 变更记录
 
-- **0.5.0**（把"重新建模"收回插件）
+- **0.5.0**（把"重新建模"收回插件，并按需加载）
   - **新工具 `bambu3mf_build`**：`boolean`（union/subtract/intersect，操作数为对象/STL/基本体）、`primitive`、`split`（一个平面拆成两个独立对象）、`replace`（一步换几何）。世界毫米坐标，保留目标 id/名称/盘/挤出机；`partsCollapsed`/`detachedMesh`/`transformBaked` 明确报告结构变化。
   - **布尔内核**：新增 `python/threemf/csg.py`，用 `manifold3d==3.5.4`（Apache-2.0）。未安装时只有布尔失败，错误里给出当前 Python 的精确 `pip install` 命令；基本体/拆分/替换/剖面/测量不依赖它。
   - **退化几何诊断**：`mesh op=diagnose` 与 `validate(deep)` 新增绕向一致性、逐壳体积、退化三角形、重复/反向面、零厚度薄片、共面内部面、嵌套壳。`analyze` 在水密但绕向不一致时返回 `volumeMm3=null`（修复上一轮 1.7 / 15.9 cm³ 的假体积）。
@@ -398,15 +404,15 @@ node selftest/schema_contract.mjs selftest/fixtures_v05
   - **小噪音**：`inspect` 的 `parts` 改为"1 个部件（id=1, normal_part）"；`settings_limit` 对常用键生效；`mesh` 缺 object 给明确 `INVALID_ARGS`；`import_stl`/`build` 支持 `allow_overlap` 抑制预期重叠告警；`_diag` 不再丢弃结构化字段。
   - 自测新增 9 项（布尔/拆分/替换/基本体/剖面/测量/绕向/共面/几何 diff），契约样本新增 12 个（`selftest/fixtures_v05`）。
 
-- **未发布（按需加载）**
-  - **七个工具改为门控注册**：新增 `lib/gate.mjs`，用 `register(definition, { when })` 在每步判定是否进入上下文。无关会话从固定 3,655 token 降到 0；只提到过 3mf 时约 741 token；在项目目录里工作时不变。见上文"按需加载"。
-  - **会话内粘住**：任一 `bambu3mf_*` 成功调用后，本会话内七个工具持续可见，避免换目录后工具突然消失。实现是在 `createTools` 返回处统一包一层 `execute`，不侵入各工具实现。
+- **0.5.0 · 按需加载**
+  - **八个工具改为门控注册**：新增 `lib/gate.mjs`，用 `register(definition, { when })` 在每步判定是否进入上下文。无关会话从固定约 6,900 token 降到 0；只提到过 3mf 时约 1,300 token；在项目目录里工作时不变。见上文"按需加载"。
+  - **会话内粘住**：任一 `bambu3mf_*` 成功调用后，本会话内八个工具持续可见，避免换目录后工具突然消失。实现是在 `createTools` 返回处统一包一层 `execute`，不侵入各工具实现。
   - **`bambu3mf_slice` 额外要求 CLI**：`bambu-studio.exe` 解析不到时不占位（否则它只能报 `CLI_MISSING`）。探测结果按插件生命周期缓存，不进入每步路径。
-  - **新增 `selftest/gating.mjs`**（28 项）：覆盖三层信号、粘住隔离、缓存过期，以及"条件永不抛异常"（10 种畸形 context + 5 种畸形 agent）与"缓存后单次成本 < 0.05ms"两条硬约束。
+  - **新增 `selftest/gating.mjs`**（36 项）：覆盖三层信号、粘住隔离、缓存过期，以及"条件永不抛异常"（10 种畸形 context + 5 种畸形 agent）与"缓存后单次成本 < 0.05ms"两条硬约束。
   - **修 `cwdOf` 的取值时机**：`ctx.get('workingDirectory')` 在 `apply()` 期间可能还没注入，捕获成 `undefined` 会让门控永久退回 `header.cwd`。改为在条件内部惰性读取。
   - 安装方式改为 `link:`（与 `dsh-mumu-debug` 一致），源码在 `H:\dsh_workspace\dsh-bambu-3mf`；原来的 `0.4.1` tarball 未改动，可随时回滚。
 
-- **未发布（门控在真实会话里的两个缺陷）**
+- **0.5.0 · 门控现场验证**
 
   用四个干净子会话做 A/B 对照（无 3mf 目录 / 87 个 3mf 目录 / 只有 STL / 只在消息里提到路径），
   再从 `session.v4.jsonl.zstd` 里读出每一步 `request/header` 实际收到的工具清单，
@@ -493,7 +499,7 @@ node selftest/schema_contract.mjs selftest/fixtures_v05
 插件已经以 `link:` 方式装进当前 `desktop` profile：
 
 ```text
-plugin_manager install_bundle  target="link:D:/dk_work/dsh_workspace/dsh-bambu-3mf"
+plugin_manager install_bundle  target="link:H:/dsh_workspace/dsh-bambu-3mf"
 plugin_manager remove_bundle   target="@local/dsh-bambu-3mf"
 ```
 
@@ -501,12 +507,12 @@ plugin_manager remove_bundle   target="@local/dsh-bambu-3mf"
 
 ## 搬到其他机器
 
-插件是纯 JS + 纯 Python 源码，**没有 npm 依赖、没有编译步骤、清单里没有绝对路径**，所以搬机器 = 拷贝 + 装一次。要出制品时在包目录跑 `pnpm pack` 得到 tgz，或直接把源码目录打成 zip：
+插件是纯 JS + 纯 Python 源码，**没有 npm 依赖、没有编译步骤、清单里没有绝对路径**，所以搬机器 = 拷贝 + 装一次。要出制品时在包目录跑 `pnpm pack` 得到 tgz，或直接把源码目录打成 zip（仓库只放源码，下表是出包后的文件名）：
 
 | 文件 | 结构 | 用途 |
 |---|---|---|
 | `dsh-bambu-3mf-0.5.0.zip` | 顶层一个 `dsh-bambu-3mf-0.5.0/` 目录 | 手工拷贝用，解压后这个目录就是包目录 |
-| `dsh-bambu-3mf-0.5.0.tgz` | npm/pnpm 格式，`package/` 前缀 | 安装器可直接把这个文件路径当 install spec |
+| `local-dsh-bambu-3mf-0.5.0.tgz` | npm/pnpm 格式，`package/` 前缀 | 安装器可直接把这个文件路径当 install spec |
 
 `node_modules`、`__pycache__`、`*.pyc` 都已被排除。
 
@@ -524,7 +530,7 @@ plugin_manager remove_bundle   target="@local/dsh-bambu-3mf"
 **装法 A：目标机器上有个 agent（推荐）**
 
 ```text
-plugin_manager install_bundle  target="C:/Users/<you>/dsh-plugins/dsh-bambu-3mf-0.5.0.tgz"
+plugin_manager install_bundle  target="C:/Users/<you>/dsh-plugins/local-dsh-bambu-3mf-0.5.0.tgz"
 # 或者指向解压后的目录：
 plugin_manager install_bundle  target="C:/Users/<you>/dsh-plugins/dsh-bambu-3mf"
 ```
@@ -536,7 +542,7 @@ plugin_manager install_bundle  target="C:/Users/<you>/dsh-plugins/dsh-bambu-3mf"
 1. 解压到稳定目录，例如 `C:\Users\<you>\dsh-plugins\dsh-bambu-3mf`。
 2. 在 `%USERPROFILE%\.dsh\profiles\<profile>\package.json` 的 `dependencies` 里加
    `"@local/dsh-bambu-3mf": "link:C:/Users/<you>/dsh-plugins/dsh-bambu-3mf"`
-   （或 `"file:C:/Users/<you>/dsh-plugins/dsh-bambu-3mf-0.5.0.tgz"`），
+   （或 `"file:C:/Users/<you>/dsh-plugins/local-dsh-bambu-3mf-0.5.0.tgz"`），
    并把 `"@local/dsh-bambu-3mf"` 追加进 `dsh.profile.bundles`。
 3. 在该 profile 目录跑 `pnpm install`（DSH 自带 pnpm 在
    `%USERPROFILE%\.dsh\dsh-runtimes\<runtime>\dependencies\pnpm\bin\pnpm.mjs`），然后重启 DSH。
@@ -544,7 +550,7 @@ plugin_manager install_bundle  target="C:/Users/<you>/dsh-plugins/dsh-bambu-3mf"
 **装法 C：命令行一行搞定**（等价于 A，走 `dsh plugin` 转发 pnpm 并自动补 `dsh.profile.bundles`）
 
 ```powershell
-dsh plugin --profile desktop add "C:\Users\<you>\dsh-plugins\dsh-bambu-3mf-0.5.0.tgz"
+dsh plugin --profile desktop add "C:\Users\<you>\dsh-plugins\local-dsh-bambu-3mf-0.5.0.tgz"
 ```
 
 **搬过去要自己补的**
