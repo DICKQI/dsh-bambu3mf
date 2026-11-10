@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Bambu 3MF Editor",
+    "description": "Inspect, compare, boolean-model, split, diagnose, reshape, render and slice Bambu Studio .3mf projects without losing print settings, with print-time attribution."
+  }
+}

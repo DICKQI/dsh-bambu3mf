@@ -1,0 +1,190 @@
+{
+    "error_string": "Success.",
+    "layer_height": 0.20000000298023224,
+    "peak_rss_mb": 143.86328125,
+    "plate_index": 1,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Custom": 365.0224609375,
+                "Flush": 25.0,
+                "Outer wall": 1664.079833984375,
+                "Travel": 21.542619705200195,
+                "Undefined": 7.199082851409912
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFL03",
+                    "id": 1,
+                    "main_used_g": 6.15391731262207,
+                    "total_used_g": 6.15391731262207
+                }
+            ],
+            "id": 1,
+            "layer_filament_change": 0,
+            "main_predication": 1660.5318603515625,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 15.581339836120605,
+                        "height": 8.0,
+                        "width": 15.93563461303711,
+                        "x": 31.071870803833008,
+                        "y": 31.626995086669922,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 5,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581339836120605,
+                        "height": 8.0,
+                        "width": 15.935636520385742,
+                        "x": 31.07185935974121,
+                        "y": 120.20933532714844,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 81,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581339836120605,
+                        "height": 8.0,
+                        "width": 15.935633659362793,
+                        "x": 120.0204849243164,
+                        "y": 31.626985549926758,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 101,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581343650817871,
+                        "height": 8.0,
+                        "width": 15.935636520385742,
+                        "x": 31.07185935974121,
+                        "y": 208.7916717529297,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 109,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581337928771973,
+                        "height": 8.0,
+                        "width": 15.935639381408691,
+                        "x": 120.02046966552734,
+                        "y": 120.2093276977539,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 117,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581339836120605,
+                        "height": 8.0,
+                        "width": 15.935630798339844,
+                        "x": 208.96910095214844,
+                        "y": 31.626985549926758,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 125,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581334114074707,
+                        "height": 8.0,
+                        "width": 15.935639381408691,
+                        "x": 120.02046966552734,
+                        "y": 208.7916717529297,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 137,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581337928771973,
+                        "height": 8.0,
+                        "width": 15.935636520385742,
+                        "x": 208.96908569335938,
+                        "y": 120.2093276977539,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 141,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                },
+                {
+                    "bbox": {
+                        "depth": 15.581334114074707,
+                        "height": 8.0,
+                        "width": 15.935636520385742,
+                        "x": 208.96908569335938,
+                        "y": 208.7916717529297,
+                        "z": -1.7763568394002505e-15
+                    },
+                    "id": 145,
+                    "name": "4mm5通集线器.STEP",
+                    "triangle_count": 4196
+                }
+            ],
+            "times": {
+                "conflict_check_time": 5,
+                "detect_overhangs_time": 3,
+                "export_gcode_time": 3757,
+                "flush_plan_time": 0,
+                "generate_support_material_time": 27,
+                "infill_generate_time": 0,
+                "infill_time": 3,
+                "ironing_time": 0,
+                "make_perimeters_time": 55,
+                "multifilament_segment_2d_time": 0,
+                "other_slice_time": 5,
+                "prepare_infill_time": 3,
+                "region_split_time": 0,
+                "skirt_brim_time": 33,
+                "slice_layers_time": 31,
+                "sliced_time": 3901,
+                "sliced_time_with_cache": 3790,
+                "support_detect_time": 0,
+                "support_interface_time": 0,
+                "support_normal_generate_time": 0,
+                "support_toolpath_time": 0,
+                "support_tree_generate_time": 0,
+                "toolpath_time": 1,
+                "wall_time": 24,
+                "wipe_tower_time": 5
+            },
+            "total_predication": 2061.18017578125,
+            "triangle_count": 37764,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 0.0,
+    "times": {
+        "export_3mf_time": 205,
+        "export_slicedata_time": 0,
+        "export_time": 208,
+        "import_time": 203,
+        "load_slicedata_time": 0,
+        "prepare_time": 213
+    },
+    "wall_loops": 1
+}

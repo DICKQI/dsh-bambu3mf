@@ -1,0 +1,29 @@
+{
+  "name": "@local/dsh-bambu-3mf",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "description": "Bambu Studio 3MF surgical editor: inspect, compare, model, split, diagnose, render and slice .3mf projects without losing print settings.",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "lib/**/*.mjs",
+    "python/**/*.py",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "selftest/*.py",
+    "selftest/*.mjs",
+    "selftest/data/*"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

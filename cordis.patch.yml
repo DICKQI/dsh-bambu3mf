@@ -1,0 +1,22 @@
+# Bambu 3MF editor bundle: one host row registering the `bambu3mf_*` tools.
+#
+# Everything is resolved at activation:
+#   pythonPath        absolute python.exe; null auto-detects the DSH runtime,
+#                     then PATH. The kernel needs lxml, numpy and Pillow.
+#                     Boolean modelling additionally needs manifold3d:
+#                     "<python>" -m pip install manifold3d==3.5.4
+#                     Primitives, split, replace, section and measure work without it.
+#   bambuStudioPath   absolute bambu-studio.exe; null auto-detects the usual
+#                     install locations. Only used by bambu3mf_slice.
+#   renderWidth       preview width in pixels (default 900).
+#   maxTriangles      preview sampling ceiling (default 250000).
+#   sliceTimeoutMs    hard cap for one Bambu Studio CLI run (default 1800000).
+- insert:
+    - id: bambu-3mf
+      name: '@local/dsh-bambu-3mf'
+      config:
+        pythonPath: null
+        bambuStudioPath: null
+        renderWidth: 900
+        maxTriangles: 250000
+        sliceTimeoutMs: 1800000

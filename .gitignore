@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Node
+node_modules/
+
+# Generated previews and fixtures
+.bambu3mf-preview/
+selftest/fixtures/
+selftest/fixtures_v05/
+selftest/__pycache__/
+
+# Local OS files
+.DS_Store
+Thumbs.db
+
+# Local packages
+*.tgz
+*.zip
